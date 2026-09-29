@@ -27,9 +27,9 @@ jobs:
 
       # Lancer les tests
       - run: npm test
-
+      - if: always()
       # Écrire le statut et la ref du commit dans le résumé
-      - run: |
+        run: |
           echo "## Résultat : " >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Statut du job : ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
