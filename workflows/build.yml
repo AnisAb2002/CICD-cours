@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le code
+      - uses: actions/checkout@v7
+
+      # Préparer l'environnement Node.js
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.18.0
+
+      # Installer les dépendances
+      - run: npm ci
+
+      # Construire le projet
+      - name: Construire
+        run: |
+          mkdir -p dist
+          echo "# Build de mon projet" > dist/README.md
+          echo "Build réalisé avec succès." >> dist/README.md
+
+      # Vérifier que le fichier de build existe
+      - name: Vérifier le build
+        run: |
+          test -f dist/README.md
+          echo "Le fichier dist/README.md existe."
+
+      # Sauvegarder dist/ comme artefact
+      - name: Sauvegarder l'artefact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build
+          path: dist/
+
+      # Résumé du build
+      - name: Résumé du build
+        run: |
+          echo "## Résumé du build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Statut :** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branche :** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit :** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Fichier généré :** dist/README.md" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environnement :** Ubuntu + Node.js 24.18.0" >> $GITHUB_STEP_SUMMARY
