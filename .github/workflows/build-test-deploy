@@ -1,0 +1,140 @@
+name: Build, Test and Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environnement de déploiement"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+
+  # ==========================
+  # BUILD
+  # ==========================
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      # Récupérer le dépôt
+      - name: Récupérer le code
+        uses: actions/checkout@v7
+
+      # Installer Node.js
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      # Installer les dépendances
+      - name: Installer les dépendances
+        run: npm ci
+
+      # Construire l'application
+      - name: Build
+        run: npm run build
+
+      # Publier dist/ comme artefact
+      - name: Publier le build
+        uses: actions/upload-artifact@v7
+        with:
+          name: application
+          path: dist/
+
+
+  # ==========================
+  # TEST
+  # ==========================
+  test:
+    needs: build
+
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+        node:
+          - 20
+          - 22
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Récupérer le dépôt
+      - name: Récupérer le code
+        uses: actions/checkout@v7
+
+      # Installer la version de Node correspondant à la variante
+      - name: Installer Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Récupérer le même artefact pour toutes les variantes
+      - name: Récupérer le build
+        uses: actions/download-artifact@v7
+        with:
+          name: application
+          path: dist/
+
+      # Installer les dépendances
+      - name: Installer les dépendances
+        run: npm ci
+
+      # Tester
+      - name: Lancer les tests
+        run: npm test
+
+
+  # ==========================
+  # DEPLOY
+  # ==========================
+  deploy:
+    needs: test
+
+    permissions:
+      contents: read
+
+    environment:
+      name: ${{ inputs.environment }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le build
+      - name: Récupérer l'artefact
+        uses: actions/download-artifact@v7
+        with:
+          name: application
+          path: dist/
+
+      # Afficher l'URL de l'environnement
+      - name: Afficher API_URL
+        run: |
+          echo "API_URL = $API_URL"
+        env:
+          API_URL: ${{ vars.API_URL }}
+
+      # Résumé du déploiement
+      - name: Résumé du déploiement
+        run: |
+          echo "## Résumé du déploiement" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cible :** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL :** $API_URL" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit :** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        env:
+          API_URL: ${{ vars.API_URL }}
