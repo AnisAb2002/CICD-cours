@@ -1,32 +1,36 @@
-name: hello-world
+name: CI
 
 on:
   push:
 
 jobs:
   test:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Récupérer le code
-        uses: actions/checkout@v7
+      # Récupérer le code
+      - uses: actions/checkout@v7
 
-      - name: Installer Node.js
-        uses: actions/setup-node@v7
+      # Installer un environnement Node.js
+      - uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
-          cache: npm
 
-      - name: Installer les dépendances
-        run: npm hello-world
+      # Mettre en cache les dépendances npm
+      - uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
 
-      - name: Lancer les tests
-        run: npm test
+      # Installer les dépendances
+      - run: npm ci
 
-      - name: Écrire le résumé
-        run: |
-          echo "## Résultat " >> $GITHUB_STEP_SUMMARY
+      # Lancer les tests
+      - run: npm test
+
+      # Écrire le statut et la ref du commit dans le résumé
+      - run: |
+          echo "## Résultat : " >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Statut du job :** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit :** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Ref :** ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "Statut du job : ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "Ref du commit : ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
