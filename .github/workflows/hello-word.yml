@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  push:
+  push:  
 
 jobs:
   test:
@@ -24,13 +24,11 @@ jobs:
 
       # Installer les dépendances
       - run: npm ci
-
-      # Lancer les tests
-      - run: npm test
-      - if: always()
-      # Écrire le statut et la ref du commit dans le résumé
+      - run: npm test   
+      - if : always()
+      
         run: |
-          echo "## Résultat : " >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Statut du job : ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "Ref du commit : ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+        echo "Commit : ${{ github.sha }}"
+        echo "Branche : ${{ github.ref_name }}"
+        echo "Runner : ${{ runner.os }}"
+        echo "Status : ${{ job.status }}"
