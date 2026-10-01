@@ -1,1 +1,19 @@
-{"private":"true","name":"cours-node-esgi","version":"1.0.0","description":"Cours de nodejs à l'ESGI","main":"dist/index.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"author":"Anis","license":"MIT","type":"module","devDependencies":{"@rollup/plugin-run":"^3.1.0","@types/node":"^26.6.3","rolldown":"^1.2.11","typescript":"^7.0.2"}}
+{
+  "name": "seance-4",
+  "version": "1.0.0",
+  "type": "module",
+  "private": "true",
+  "scripts": {
+    "dev": "rolldown -c -w",
+    "build": "rolldown -c",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@rollup/plugin-run": "^3.1.0",
+    "@types/node": "^24.19.0",
+    "rolldown": "^1.2.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}
