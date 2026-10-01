@@ -25,10 +25,9 @@ jobs:
       # Installer les dépendances
       - run: npm ci
       - run: npm test   
-      - if : always()
-      
+      - if: always()
         run: |
-        echo "Commit : ${{ github.sha }}"
-        echo "Branche : ${{ github.ref_name }}"
-        echo "Runner : ${{ runner.os }}"
-        echo "Status : ${{ job.status }}"
+          echo "Commit : ${{ github.sha }}"
+          echo "Branche : ${{ github.ref_name }}"
+          echo "Runner : ${{ runner.os }}"
+          echo "Status : ${{ job.status }}"
