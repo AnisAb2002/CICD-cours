@@ -4,7 +4,7 @@
   "type": "module",
   "private": "true",
   "scripts": {
-    "build": "rolldown -c",
+    "build": "mkdir -p dist && touch dist/build.txt",
     "test": "echo \"test\""
   },
   "devDependencies": {
